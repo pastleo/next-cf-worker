@@ -1,0 +1,34 @@
+name: Build & deploy sta
+
+on:
+  push:
+    tags: ['sta/**']
+    branches: ['main']
+
+jobs:
+  build-deploy-sta:
+    name: Build & deploy sta
+    runs-on: ubuntu-latest
+    env:
+      BUILD_ENV: sta
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '24.0.2'
+          cache: 'pnpm'
+
+      - run: pnpm install
+
+      - run: pnpm cf:build
+
+      - run: pnpm cf:deploy
+        env:
+          GITHUB_REF: ${{ github.ref }}

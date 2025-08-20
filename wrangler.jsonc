@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": [
+    "nodejs_compat",
+  ],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "env": {
+    "sta": {
+      "name": "pastleo-next-cf-worker-sta",
+      "workers_dev": true,
+      "preview_urls": true
+    }
+  }
+}
