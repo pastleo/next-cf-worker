@@ -29,9 +29,27 @@ jobs:
 
       - run: pnpm cf:build
 
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: 'projects/744959125566/locations/global/workloadIdentityPools/github/providers/next-cf-worker-oidc'
+
+      - id: 'secrets'
+        uses: 'google-github-actions/get-secretmanager-secrets@v2'
+        with:
+          secrets: |-
+            cfAccountId:projects/744959125566/secrets/pastleo-next-cf-worker-cf-account-id
+            cfApiToken:projects/744959125566/secrets/pastleo-next-cf-worker-cf-api-token
+
       - if: github.ref_type == 'branch'
-        run: echo wrangler deploy --env=$BUILD_ENV
+        run: wrangler deploy --env=$BUILD_ENV
+        env:
+          CF_ACCOUNT_ID: '${{ steps.secrets.outputs.cfAccountId }}'
+          CF_API_TOKEN: '${{ steps.secrets.outputs.cfApiToken }}'
       - if: github.ref_type == 'tag'
         run: |
           PREVIEW_ALIAS=$(echo $GITHUB_REF_NAME | cut -d'/' -f2)
           echo wrangler versions upload --env=$BUILD_ENV --preview-alias=$PREVIEW_ALIAS
+        env:
+          CF_ACCOUNT_ID: '${{ steps.secrets.outputs.cfAccountId }}'
+          CF_API_TOKEN: '${{ steps.secrets.outputs.cfApiToken }}'
